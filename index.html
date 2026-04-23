@@ -43,25 +43,25 @@
     .blink-alert { animation: blink 1.2s infinite; }
 
     /* ===================================================
-       ⭐️ แก้ไขปัญหา PDF รีดขอบให้แคบ บีบให้พอดี A4 แนวนอน ⭐️
+       ⭐️ แก้ไขปัญหา PDF ตกขอบ PC & พอดี A4 แนวนอน ทุกอุปกรณ์ ⭐️
        =================================================== */
     .pdf-mode { 
-        width: 1150px !important; /* ล็อกความกว้างจำลองสำหรับ A4 แนวนอน */
-        max-width: none !important;
-        margin: 0 auto !important; 
-        padding: 5px !important; /* ระยะห่างเนื้อหาจากขอบน้อยสุด */
+        width: 1122px !important; /* ล็อกสัดส่วน A4 แนวนอนเป๊ะๆ */
+        max-width: 1122px !important;
+        margin: 0 !important; /* ห้ามมี margin auto ไม่งั้นกล้องถ่ายเบี้ยวตกขอบซ้าย */
+        padding: 10px 15px !important; /* ระยะห่างเนื้อหาไม่ให้ชิดขอบกระดาษเกินไป */
         background: white !important; 
         position: relative !important;
         box-sizing: border-box !important;
     }
-    .pdf-mode .pdf-title { display: block !important; margin-top: 5px !important; margin-bottom: 8px !important; font-size: 16px !important; font-weight: bold !important; text-align: center !important; color: black !important; }
+    .pdf-mode .pdf-title { display: block !important; margin-top: 0 !important; margin-bottom: 12px !important; font-size: 16px !important; font-weight: bold !important; text-align: center !important; color: black !important; }
     .pdf-mode .table-container { overflow: visible !important; max-height: none !important; border: none !important; box-shadow: none !important; }
-    .pdf-mode table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; }
+    .pdf-mode table { width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; }
     
     .pdf-mode th, .pdf-mode td { 
-        padding: 2px 1px !important; /* บีบช่องไฟให้แคบลงอีก */
-        font-size: 6.5px !important; /* ลดฟอนต์ลงเพื่อให้ 26 คอลัมน์อยู่ครบ */
-        border: 0.5px solid #475569 !important; /* เส้นกรอบบางลงให้อ่านง่าย */
+        padding: 4px 2px !important; 
+        font-size: 8px !important; /* ตัวหนังสือขนาดกำลังดี อ่านออก และพอดี 26 คอลัมน์ */
+        border: 1px solid #475569 !important; /* กรอบสีเทาเข้มให้อ่านง่ายตอนปริ้น */
         color: black !important; 
         white-space: normal !important; 
         word-wrap: break-word !important; 
@@ -69,8 +69,8 @@
     }
     .pdf-mode th { background-color: #f1f5f9 !important; font-weight: bold !important; }
     
-    .pdf-mode .pdf-no-col { width: 3% !important; } 
-    .pdf-mode .pdf-loc-col { width: 17% !important; text-align: left !important; padding-left: 3px !important; } 
+    .pdf-mode .pdf-no-col { width: 3.5% !important; } 
+    .pdf-mode .pdf-loc-col { width: 17% !important; text-align: left !important; padding-left: 4px !important; } 
     
     .pdf-mode .action-col { display: none !important; } 
     .pdf-mode .dot-cell { cursor: default !important; transform: none !important; }
@@ -334,7 +334,6 @@ let currentData = { plans: [], results: [], pms: [] };
 let filteredResults = []; 
 let currentRowForSummary = null; 
 
-// แก้ไขชื่อเดือนให้สะอาด ไม่มีสระลอย
 const shortMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 const fullMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 const thaiM = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
@@ -389,9 +388,10 @@ function switchTab(tabId) {
   toggleSidebar(true); 
 }
 
-// ⭐️ ระบบ PDF สำหรับโหลดไม่ให้ตกขอบ ⭐️
+// ⭐️ ระบบ PDF ที่แก้ปัญหาขอบและมือถือ ⭐️
 function exportToPDF(areaId, fileNamePrefix) {
-  Swal.fire({ title: 'กำลังเตรียมเอกสาร PDF...', text: 'กรุณารอสักครู่ (ในสมาร์ทโฟนอาจใช้เวลาสักพัก)', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  Swal.fire({ title: 'กำลังเตรียมเอกสาร PDF...', text: 'กรุณารอสักครู่ (ในสมาร์ทโฟนอาจใช้เวลา 10-15 วินาที)', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  
   document.querySelectorAll('.fy-label').forEach(el => el.innerText = selectedFiscalYear);
   const element = document.getElementById(areaId);
   element.classList.add('pdf-mode'); 
@@ -399,12 +399,20 @@ function exportToPDF(areaId, fileNamePrefix) {
   const titleEl = element.querySelector('.pdf-title');
   if(titleEl) titleEl.classList.remove('hidden');
 
+  // เลื่อนกลับไปบนสุดเพื่อป้องกัน html2canvas ถ่ายเบี้ยวตกขอบ
+  window.scrollTo(0, 0);
+
   setTimeout(() => {
     const opt = { 
-      margin: 3, // ขอบกระดาษแคบสุดๆ 3mm
+      margin: 3, 
       filename: `${fileNamePrefix}_FY${selectedFiscalYear}.pdf`, 
-      image: { type: 'jpeg', quality: 0.98 }, 
-      html2canvas: { scale: 2, useCORS: true, windowWidth: 1150 }, // บีบเข้า 1150px
+      image: { type: 'jpeg', quality: 1 }, 
+      html2canvas: { 
+         scale: 2, 
+         useCORS: true,
+         scrollX: 0,
+         scrollY: 0
+      }, 
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
     };
     html2pdf().set(opt).from(element).save().then(() => { 
@@ -414,9 +422,9 @@ function exportToPDF(areaId, fileNamePrefix) {
     }).catch(err => { 
       element.classList.remove('pdf-mode'); 
       if(titleEl) titleEl.classList.add('hidden');
-      Swal.fire('Error', 'ไม่สามารถสร้าง PDF ได้', 'error'); 
+      Swal.fire('Error', 'ไม่สามารถสร้าง PDF ได้: ' + err, 'error'); 
     });
-  }, 1000);
+  }, 800);
 }
 
 // ================= จัดการวันที่ =================
