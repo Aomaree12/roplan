@@ -6,6 +6,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+  
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -38,18 +39,39 @@
     @keyframes blink { 0%, 100% { background-color: #fee2e2; color: #ef4444; } 50% { background-color: #ef4444; color: #ffffff; } }
     .blink-alert { animation: blink 1.2s infinite; }
 
-    .pdf-mode { width: 100% !important; background: white !important; padding: 0 !important; }
-    .pdf-mode .pdf-title { display: block !important; margin-top: 5px !important; margin-bottom: 10px !important; font-size: 16px !important; text-align: center !important; }
-    .pdf-mode .table-container { overflow: visible !important; max-height: none !important; border: 1.5px solid #0f766e !important; box-shadow: none !important; border-radius: 0 !important; }
-    .pdf-mode th, .pdf-mode td, .pdf-mode tr, .pdf-mode thead, .pdf-mode tbody { position: static !important; transform: none !important; }
-    .pdf-mode table { width: 100% !important; table-layout: fixed !important; }
-    .pdf-mode th { padding: 3px 1px !important; font-size: 7.5px !important; border: 1px solid #115e59 !important; color: white !important; word-wrap: break-word; line-height: 1.1; }
-    .pdf-mode td { padding: 3px 1px !important; font-size: 7.5px !important; border: 1px solid #cbd5e1 !important; color: black !important; word-wrap: break-word; line-height: 1.1; }
-    .pdf-mode .pdf-no-col { width: 3.5% !important; } 
-    .pdf-mode .pdf-loc-col { width: 18% !important; text-align: left !important; padding-left: 4px !important; } 
+    /* ===================================================
+       ⭐️ แก้ไขปัญหา PDF มือถือ + ตกขอบ + พอดี A4 แนวนอน ⭐️
+       =================================================== */
+    .pdf-mode { 
+        width: 1080px !important; /* ล็อกความกว้างจำลอง สัดส่วนสำหรับ A4 Landscape */
+        max-width: none !important;
+        margin: 0 auto !important; 
+        padding: 15px !important; /* ใส่ Padding ให้ตัวหนังสือไม่ติดขอบซ้าย */
+        background: white !important; 
+        position: relative !important;
+        box-sizing: border-box !important;
+    }
+    .pdf-mode .pdf-title { display: block !important; margin-bottom: 10px !important; font-size: 16px !important; font-weight: bold !important; text-align: center !important; color: black !important; }
+    .pdf-mode .table-container { overflow: visible !important; max-height: none !important; border: none !important; box-shadow: none !important; }
+    .pdf-mode table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; }
+    
+    .pdf-mode th, .pdf-mode td { 
+        padding: 3px 1px !important; 
+        font-size: 7px !important; /* เล็กลงเพื่อให้อยู่ในหน้า A4 สบายๆ */
+        border: 1px solid #64748b !important; /* สีกรอบเข้มขึ้น */
+        color: black !important; 
+        white-space: normal !important; 
+        word-wrap: break-word !important; 
+        line-height: 1.1 !important; 
+    }
+    .pdf-mode th { background-color: #f1f5f9 !important; font-weight: bold !important; }
+    
+    .pdf-mode .pdf-no-col { width: 4% !important; } 
+    .pdf-mode .pdf-loc-col { width: 17% !important; text-align: left !important; padding-left: 4px !important; } 
+    
     .pdf-mode .action-col { display: none !important; } 
     .pdf-mode .dot-cell { cursor: default !important; transform: none !important; }
-    .pdf-mode a { text-decoration: none !important; color: #0369a1 !important; font-weight: bold !important; } 
+    .pdf-mode a { text-decoration: none !important; color: #000 !important; font-weight: normal !important; } 
   </style>
 </head>
 <body class="bg-slate-50">
@@ -181,7 +203,7 @@
         <button onclick="exportToPDF('print-yearplan', 'RO_YearPlan')" class="bg-rose-500 hover:bg-rose-600 text-white px-4 py-1.5 rounded-lg shadow-sm flex items-center justify-center gap-2 text-sm font-bold transition-all"><i class="fas fa-file-pdf"></i> โหลด PDF</button>
         <button onclick="openForm()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-1.5 rounded-lg shadow-sm flex items-center gap-2 text-sm font-bold transition-all"><i class="fas fa-plus"></i> เพิ่มจุดตรวจ</button>
       </div>
-      <div id="print-yearplan" class="bg-white">
+      <div id="print-yearplan" class="bg-white relative">
         <div class="text-center hidden pdf-title font-bold text-lg mb-2 text-slate-800">แผนการส่งตรวจวิเคราะห์คุณภาพน้ำ RO ประจำปีงบประมาณ <span class="fy-label"></span></div>
         <div class="table-container shadow-sm">
           <table class="min-w-max">
@@ -223,8 +245,15 @@
            <input type="url" name="link" placeholder="หรือแปะลิงก์ URL เดิม" class="w-full bg-white border border-teal-200 p-2 rounded-lg outline-teal-500 text-blue-600 text-xs shadow-sm">
         </div>
 
-        <div><label class="block text-xs font-bold text-teal-700 mb-1">หมายเหตุ</label><input type="text" name="note" placeholder="ระบุการแก้ไข..." class="w-full bg-white border border-teal-200 p-2 rounded-lg outline-teal-500 text-teal-800 text-sm shadow-sm"></div>
-        <div><label class="block text-xs font-bold text-teal-700 mb-1">แนบภาพเพิ่มเติม</label><input type="file" id="extraFile" accept="image/*,application/pdf" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100 mb-1"></div>
+        <div>
+           <label class="block text-xs font-bold text-teal-700 mb-1">หมายเหตุ</label>
+           <input type="text" name="note" placeholder="ระบุการแก้ไข..." class="w-full bg-white border border-teal-200 p-2 rounded-lg outline-teal-500 text-teal-800 text-sm shadow-sm">
+        </div>
+
+        <div>
+           <label class="block text-xs font-bold text-teal-700 mb-1">แนบภาพเพิ่มเติม</label>
+           <input type="file" id="extraFile" accept="image/*,application/pdf" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100 mb-1">
+        </div>
         
         <div class="pt-3 mt-1"><button type="submit" class="w-full bg-teal-500 text-white font-bold py-3 rounded-lg hover:bg-teal-600 shadow-md shadow-teal-200">อัปโหลดและบันทึกข้อมูล</button></div>
       </form>
@@ -282,6 +311,7 @@
   </div>
 
 <script>
+
 // ==========================================
 // ⭐️ ใส่ URL ของ Web App คุณตรงนี้ ⭐️
 // ==========================================
@@ -301,11 +331,11 @@ let currentData = { plans: [], results: [], pms: [] };
 let filteredResults = []; 
 let currentRowForSummary = null; 
 
-// แก้ไขชื่อเดือนให้สะอาด ไม่มีสระลอย
+// ⭐️ พิมพ์ชื่อเดือนใหม่ให้คลีน 100%
 const shortMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 const fullMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-const thaiM = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
-const thaiFull = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+const thaiM = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+const thaiFull = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 
 let currentFiscalYear = 0; let selectedFiscalYear = 0; let currentMonthIndex = 0; 
 
@@ -322,12 +352,12 @@ async function callAPI(action, payload = {}) {
     const response = await fetch(API_URL, {
       redirect: "follow",
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      headers: { "Content-Type": "text-plain;charset=utf-8" },
       body: JSON.stringify({ action: action, ...payload })
     });
     return await response.json();
   } catch (error) {
-    throw new Error("ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบว่าคุณได้ Deploy เป็น New Version บน Google Apps Script หรือยัง");
+    throw new Error("ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบว่าคุณได้ Deploy เป็น New Version หรือยัง");
   }
 }
 
@@ -356,8 +386,9 @@ function switchTab(tabId) {
   toggleSidebar(true); 
 }
 
+// ⭐️ ระบบ PDF ใหม่ (แก้มือถือ + โชว์ชื่อ + ไม่ตกขอบ)
 function exportToPDF(areaId, fileNamePrefix) {
-  Swal.fire({ title: 'กำลังเตรียมเอกสาร PDF...', text: 'กรุณารอสักครู่ (สมาร์ทโฟนอาจใช้เวลา 10-15 วินาที)', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  Swal.fire({ title: 'กำลังเตรียมเอกสาร PDF...', text: 'กรุณารอสักครู่ (สมาร์ทโฟนอาจใช้เวลาสักพัก)', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
   document.querySelectorAll('.fy-label').forEach(el => el.innerText = selectedFiscalYear);
   const element = document.getElementById(areaId);
   element.classList.add('pdf-mode'); 
@@ -367,10 +398,10 @@ function exportToPDF(areaId, fileNamePrefix) {
 
   setTimeout(() => {
     const opt = { 
-      margin: [5, 5, 5, 5], 
+      margin: 5, 
       filename: `${fileNamePrefix}_FY${selectedFiscalYear}.pdf`, 
       image: { type: 'jpeg', quality: 0.98 }, 
-      html2canvas: { scale: 2, useCORS: true, windowWidth: 1400 },
+      html2canvas: { scale: 1.5, useCORS: true }, // ใช้ scale 1.5 เพื่อถนอม RAM มือถือ
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
     };
     html2pdf().set(opt).from(element).save().then(() => { 
