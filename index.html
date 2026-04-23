@@ -11,7 +11,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <script>
-    window.onerror = function(msg, url, line, col, error) { console.error(msg, error); };
+    window.onerror = function(msg, url, line, col, error) {
+       console.error(msg, error);
+       Swal.fire('เกิดข้อผิดพลาดบนหน้าเว็บ', msg + '<br>บรรทัดที่: ' + line, 'error');
+    };
   </script>
 
   <style>
@@ -40,25 +43,25 @@
     .blink-alert { animation: blink 1.2s infinite; }
 
     /* ===================================================
-       ⭐️ แก้ไขปัญหา PDF มือถือ + ตกขอบ + พอดี A4 แนวนอน ⭐️
+       ⭐️ แก้ไขปัญหา PDF รีดขอบให้แคบ บีบให้พอดี A4 แนวนอน ⭐️
        =================================================== */
     .pdf-mode { 
-        width: 1080px !important; /* ล็อกความกว้างจำลอง สัดส่วนสำหรับ A4 Landscape */
+        width: 1150px !important; /* ล็อกความกว้างจำลองสำหรับ A4 แนวนอน */
         max-width: none !important;
         margin: 0 auto !important; 
-        padding: 15px !important; /* ใส่ Padding ให้ตัวหนังสือไม่ติดขอบซ้าย */
+        padding: 5px !important; /* ระยะห่างเนื้อหาจากขอบน้อยสุด */
         background: white !important; 
         position: relative !important;
         box-sizing: border-box !important;
     }
-    .pdf-mode .pdf-title { display: block !important; margin-bottom: 10px !important; font-size: 16px !important; font-weight: bold !important; text-align: center !important; color: black !important; }
+    .pdf-mode .pdf-title { display: block !important; margin-top: 5px !important; margin-bottom: 8px !important; font-size: 16px !important; font-weight: bold !important; text-align: center !important; color: black !important; }
     .pdf-mode .table-container { overflow: visible !important; max-height: none !important; border: none !important; box-shadow: none !important; }
     .pdf-mode table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; }
     
     .pdf-mode th, .pdf-mode td { 
-        padding: 3px 1px !important; 
-        font-size: 7px !important; /* เล็กลงเพื่อให้อยู่ในหน้า A4 สบายๆ */
-        border: 1px solid #64748b !important; /* สีกรอบเข้มขึ้น */
+        padding: 2px 1px !important; /* บีบช่องไฟให้แคบลงอีก */
+        font-size: 6.5px !important; /* ลดฟอนต์ลงเพื่อให้ 26 คอลัมน์อยู่ครบ */
+        border: 0.5px solid #475569 !important; /* เส้นกรอบบางลงให้อ่านง่าย */
         color: black !important; 
         white-space: normal !important; 
         word-wrap: break-word !important; 
@@ -66,8 +69,8 @@
     }
     .pdf-mode th { background-color: #f1f5f9 !important; font-weight: bold !important; }
     
-    .pdf-mode .pdf-no-col { width: 4% !important; } 
-    .pdf-mode .pdf-loc-col { width: 17% !important; text-align: left !important; padding-left: 4px !important; } 
+    .pdf-mode .pdf-no-col { width: 3% !important; } 
+    .pdf-mode .pdf-loc-col { width: 17% !important; text-align: left !important; padding-left: 3px !important; } 
     
     .pdf-mode .action-col { display: none !important; } 
     .pdf-mode .dot-cell { cursor: default !important; transform: none !important; }
@@ -331,11 +334,11 @@ let currentData = { plans: [], results: [], pms: [] };
 let filteredResults = []; 
 let currentRowForSummary = null; 
 
-// ⭐️ พิมพ์ชื่อเดือนใหม่ให้คลีน 100%
+// แก้ไขชื่อเดือนให้สะอาด ไม่มีสระลอย
 const shortMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 const fullMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-const thaiM = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-const thaiFull = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+const thaiM = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+const thaiFull = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
 
 let currentFiscalYear = 0; let selectedFiscalYear = 0; let currentMonthIndex = 0; 
 
@@ -357,7 +360,7 @@ async function callAPI(action, payload = {}) {
     });
     return await response.json();
   } catch (error) {
-    throw new Error("ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบว่าคุณได้ Deploy เป็น New Version หรือยัง");
+    throw new Error("ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบว่าคุณได้ Deploy เป็น New Version บน Google Apps Script หรือยัง");
   }
 }
 
@@ -386,9 +389,9 @@ function switchTab(tabId) {
   toggleSidebar(true); 
 }
 
-// ⭐️ ระบบ PDF ใหม่ (แก้มือถือ + โชว์ชื่อ + ไม่ตกขอบ)
+// ⭐️ ระบบ PDF สำหรับโหลดไม่ให้ตกขอบ ⭐️
 function exportToPDF(areaId, fileNamePrefix) {
-  Swal.fire({ title: 'กำลังเตรียมเอกสาร PDF...', text: 'กรุณารอสักครู่ (สมาร์ทโฟนอาจใช้เวลาสักพัก)', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  Swal.fire({ title: 'กำลังเตรียมเอกสาร PDF...', text: 'กรุณารอสักครู่ (ในสมาร์ทโฟนอาจใช้เวลาสักพัก)', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
   document.querySelectorAll('.fy-label').forEach(el => el.innerText = selectedFiscalYear);
   const element = document.getElementById(areaId);
   element.classList.add('pdf-mode'); 
@@ -398,10 +401,10 @@ function exportToPDF(areaId, fileNamePrefix) {
 
   setTimeout(() => {
     const opt = { 
-      margin: 5, 
+      margin: 3, // ขอบกระดาษแคบสุดๆ 3mm
       filename: `${fileNamePrefix}_FY${selectedFiscalYear}.pdf`, 
       image: { type: 'jpeg', quality: 0.98 }, 
-      html2canvas: { scale: 1.5, useCORS: true }, // ใช้ scale 1.5 เพื่อถนอม RAM มือถือ
+      html2canvas: { scale: 2, useCORS: true, windowWidth: 1150 }, // บีบเข้า 1150px
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
     };
     html2pdf().set(opt).from(element).save().then(() => { 
