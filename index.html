@@ -6,15 +6,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
-  
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <script>
-    window.onerror = function(msg, url, line, col, error) {
-       console.error(msg, error);
-       Swal.fire('เกิดข้อผิดพลาดบนหน้าเว็บ', msg + '<br>บรรทัดที่: ' + line, 'error');
-    };
+    window.onerror = function(msg, url, line, col, error) { console.error(msg, error); };
   </script>
 
   <style>
@@ -42,23 +38,15 @@
     @keyframes blink { 0%, 100% { background-color: #fee2e2; color: #ef4444; } 50% { background-color: #ef4444; color: #ffffff; } }
     .blink-alert { animation: blink 1.2s infinite; }
 
-    /* ===================================================
-       ⭐️ แก้ไขปัญหา PDF ให้อักษรเล็ก พอดีขอบ และโชว์หัวข้อ ⭐️
-       =================================================== */
     .pdf-mode { width: 100% !important; background: white !important; padding: 0 !important; }
     .pdf-mode .pdf-title { display: block !important; margin-top: 5px !important; margin-bottom: 10px !important; font-size: 16px !important; text-align: center !important; }
     .pdf-mode .table-container { overflow: visible !important; max-height: none !important; border: 1.5px solid #0f766e !important; box-shadow: none !important; border-radius: 0 !important; }
     .pdf-mode th, .pdf-mode td, .pdf-mode tr, .pdf-mode thead, .pdf-mode tbody { position: static !important; transform: none !important; }
     .pdf-mode table { width: 100% !important; table-layout: fixed !important; }
-    
-    /* ปรับขนาดฟอนต์ให้เล็กสุดๆ เพื่อให้ใส่ 26 คอลัมน์ได้สบายๆ */
     .pdf-mode th { padding: 3px 1px !important; font-size: 7.5px !important; border: 1px solid #115e59 !important; color: white !important; word-wrap: break-word; line-height: 1.1; }
     .pdf-mode td { padding: 3px 1px !important; font-size: 7.5px !important; border: 1px solid #cbd5e1 !important; color: black !important; word-wrap: break-word; line-height: 1.1; }
-    
-    /* ล็อกความกว้างคอลัมน์สำคัญ */
     .pdf-mode .pdf-no-col { width: 3.5% !important; } 
     .pdf-mode .pdf-loc-col { width: 18% !important; text-align: left !important; padding-left: 4px !important; } 
-    
     .pdf-mode .action-col { display: none !important; } 
     .pdf-mode .dot-cell { cursor: default !important; transform: none !important; }
     .pdf-mode a { text-decoration: none !important; color: #0369a1 !important; font-weight: bold !important; } 
@@ -67,9 +55,7 @@
 <body class="bg-slate-50">
 
   <div id="initialLoader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center transition-opacity duration-500">
-     <div class="loader mb-4"></div>
-     <h2 class="text-lg font-bold text-teal-700">กำลังเชื่อมต่อฐานข้อมูล...</h2>
-     <p class="text-sm text-slate-400">กรุณารอสักครู่</p>
+     <div class="loader mb-4"></div><h2 class="text-lg font-bold text-teal-700">กำลังเชื่อมต่อฐานข้อมูล...</h2><p class="text-sm text-slate-400">กรุณารอสักครู่</p>
   </div>
 
   <div id="sidebarOverlay" x-cloak class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden transition-opacity" onclick="toggleSidebar()"></div>
@@ -81,34 +67,18 @@
     
     <div class="p-3 flex flex-col gap-1 flex-grow mt-1 overflow-y-auto">
       <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 ml-2">เมนูภายในระบบ</p>
-      <button onclick="switchTab('results')" id="btn-results" class="menu-active w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-teal-600 bg-teal-50/50 border-l-4 border-teal-500 text-sm">
-        <i class="fas fa-flask w-6 text-center mr-2"></i> ตารางบันทึกผลการตรวจ
-      </button>
-      <button onclick="switchTab('monthplan')" id="btn-monthplan" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm">
-        <i class="fas fa-calendar-day w-6 text-center mr-2"></i> แผนส่งตรวจรายเดือน
-      </button>
-      <button onclick="switchTab('yearplan')" id="btn-yearplan" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm">
-        <i class="fas fa-table w-6 text-center mr-2"></i> ตารางรายปี (Year Plan)
-      </button>
-      <button onclick="switchTab('plan')" id="btn-plan" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm">
-        <i class="fas fa-database w-6 text-center mr-2"></i> ฐานข้อมูลจุดตรวจ
-      </button>
+      <button onclick="switchTab('results')" id="btn-results" class="menu-active w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-teal-600 bg-teal-50/50 border-l-4 border-teal-500 text-sm"><i class="fas fa-flask w-6 text-center mr-2"></i> ตารางบันทึกผลการตรวจ</button>
+      <button onclick="switchTab('monthplan')" id="btn-monthplan" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm"><i class="fas fa-calendar-day w-6 text-center mr-2"></i> แผนส่งตรวจรายเดือน</button>
+      <button onclick="switchTab('yearplan')" id="btn-yearplan" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm"><i class="fas fa-table w-6 text-center mr-2"></i> ตารางรายปี (Year Plan)</button>
+      <button onclick="switchTab('plan')" id="btn-plan" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm"><i class="fas fa-database w-6 text-center mr-2"></i> ฐานข้อมูลจุดตรวจ</button>
 
       <div class="border-t border-slate-200 my-2"></div>
       
       <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 ml-2">รายการเพิ่มเติม</p>
-      <button onclick="switchTab('pm')" id="btn-pm" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm">
-        <i class="fas fa-tools w-6 text-center mr-2 text-pink-500"></i> รายการ PM
-      </button>
-      <a href="https://aomaree12.github.io/rodb.github.io/" target="_blank" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm">
-        <i class="fas fa-chart-pie w-6 text-center mr-2 text-indigo-500"></i> Dashboard RO
-      </a>
-      <a href="https://drive.google.com/file/d/17fUpMq_IKtusj-mSst2TPGxe7xTB1zov/view?usp=sharing" target="_blank" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm">
-        <i class="fas fa-project-diagram w-6 text-center mr-2 text-rose-500"></i> ผังระบบน้ำ
-      </a>
-      <a href="https://drive.google.com/file/d/1Rr8SnvlBccDM2wP7tUoXgfJI2mC4yX8Q/view?usp=sharing" target="_blank" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm">
-        <i class="fas fa-book w-6 text-center mr-2 text-slate-500"></i> แนวปฏิบัติ
-      </a>
+      <button onclick="switchTab('pm')" id="btn-pm" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm"><i class="fas fa-tools w-6 text-center mr-2 text-pink-500"></i> รายการ PM</button>
+      <a href="https://aomaree12.github.io/rodb.github.io/" target="_blank" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm"><i class="fas fa-chart-pie w-6 text-center mr-2 text-indigo-500"></i> Dashboard RO</a>
+      <a href="https://drive.google.com/file/d/17fUpMq_IKtusj-mSst2TPGxe7xTB1zov/view?usp=sharing" target="_blank" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm"><i class="fas fa-project-diagram w-6 text-center mr-2 text-rose-500"></i> ผังระบบน้ำ</a>
+      <a href="https://drive.google.com/file/d/1Rr8SnvlBccDM2wP7tUoXgfJI2mC4yX8Q/view?usp=sharing" target="_blank" class="menu-inactive w-full text-left px-4 py-3 rounded-lg transition-all flex items-center text-sm"><i class="fas fa-book w-6 text-center mr-2 text-slate-500"></i> แนวปฏิบัติ</a>
     </div>
     <div class="p-4 border-t border-slate-100 text-center text-xs text-slate-400">FY: <span id="fySidebarDisplay"></span></div>
   </div>
@@ -253,15 +223,8 @@
            <input type="url" name="link" placeholder="หรือแปะลิงก์ URL เดิม" class="w-full bg-white border border-teal-200 p-2 rounded-lg outline-teal-500 text-blue-600 text-xs shadow-sm">
         </div>
 
-        <div>
-           <label class="block text-xs font-bold text-teal-700 mb-1">หมายเหตุ</label>
-           <input type="text" name="note" placeholder="ระบุการแก้ไข..." class="w-full bg-white border border-teal-200 p-2 rounded-lg outline-teal-500 text-teal-800 text-sm shadow-sm">
-        </div>
-
-        <div>
-           <label class="block text-xs font-bold text-teal-700 mb-1">แนบภาพเพิ่มเติม</label>
-           <input type="file" id="extraFile" accept="image/*,application/pdf" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100 mb-1">
-        </div>
+        <div><label class="block text-xs font-bold text-teal-700 mb-1">หมายเหตุ</label><input type="text" name="note" placeholder="ระบุการแก้ไข..." class="w-full bg-white border border-teal-200 p-2 rounded-lg outline-teal-500 text-teal-800 text-sm shadow-sm"></div>
+        <div><label class="block text-xs font-bold text-teal-700 mb-1">แนบภาพเพิ่มเติม</label><input type="file" id="extraFile" accept="image/*,application/pdf" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100 mb-1"></div>
         
         <div class="pt-3 mt-1"><button type="submit" class="w-full bg-teal-500 text-white font-bold py-3 rounded-lg hover:bg-teal-600 shadow-md shadow-teal-200">อัปโหลดและบันทึกข้อมูล</button></div>
       </form>
@@ -319,9 +282,8 @@
   </div>
 
 <script>
-
 // ==========================================
-// ⭐️ URL ของ Apps Script ของคุณ ⭐️
+// ⭐️ ใส่ URL ของ Web App คุณตรงนี้ ⭐️
 // ==========================================
 const API_URL = "https://script.google.com/macros/s/AKfycbyOL3J6r5YLT0xYS5-Dle5X-SxfH9OO3JgbHdNGQ8X9J8dk8msoOn2QcT8ilIdNw16b/exec"; 
 
@@ -339,6 +301,7 @@ let currentData = { plans: [], results: [], pms: [] };
 let filteredResults = []; 
 let currentRowForSummary = null; 
 
+// แก้ไขชื่อเดือนให้สะอาด ไม่มีสระลอย
 const shortMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 const fullMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 const thaiM = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
@@ -353,16 +316,18 @@ document.addEventListener('DOMContentLoaded', function() {
   loadAllData();
 });
 
-// ================= ฟังก์ชันเชื่อมต่อกับ Google Apps Script (Fetch API) =================
+// ================= ฟังก์ชันเชื่อมต่อ API =================
 async function callAPI(action, payload = {}) {
   try {
     const response = await fetch(API_URL, {
+      redirect: "follow",
       method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({ action: action, ...payload })
     });
     return await response.json();
   } catch (error) {
-    throw new Error("ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
+    throw new Error("ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบว่าคุณได้ Deploy เป็น New Version บน Google Apps Script หรือยัง");
   }
 }
 
@@ -391,23 +356,21 @@ function switchTab(tabId) {
   toggleSidebar(true); 
 }
 
-// ⭐️ ระบบสร้าง PDF (แก้มือถือ + บังคับเปิดหัวข้อ)
 function exportToPDF(areaId, fileNamePrefix) {
-  Swal.fire({ title: 'กำลังเตรียมเอกสาร PDF...', text: 'กรุณารอสักครู่ (ในสมาร์ทโฟนอาจใช้เวลา 10-15 วินาที)', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  Swal.fire({ title: 'กำลังเตรียมเอกสาร PDF...', text: 'กรุณารอสักครู่ (สมาร์ทโฟนอาจใช้เวลา 10-15 วินาที)', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
   document.querySelectorAll('.fy-label').forEach(el => el.innerText = selectedFiscalYear);
   const element = document.getElementById(areaId);
   element.classList.add('pdf-mode'); 
   
-  // บังคับโชว์หัวข้อ
   const titleEl = element.querySelector('.pdf-title');
   if(titleEl) titleEl.classList.remove('hidden');
 
   setTimeout(() => {
     const opt = { 
-      margin: [10, 10, 10, 10], 
+      margin: [5, 5, 5, 5], 
       filename: `${fileNamePrefix}_FY${selectedFiscalYear}.pdf`, 
       image: { type: 'jpeg', quality: 0.98 }, 
-      html2canvas: { scale: 2, useCORS: true, windowWidth: 1400 }, // หลอกมือถือว่าเป็นจอ 1400px
+      html2canvas: { scale: 2, useCORS: true, windowWidth: 1400 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
     };
     html2pdf().set(opt).from(element).save().then(() => { 
@@ -417,12 +380,12 @@ function exportToPDF(areaId, fileNamePrefix) {
     }).catch(err => { 
       element.classList.remove('pdf-mode'); 
       if(titleEl) titleEl.classList.add('hidden');
-      Swal.fire('Error', err, 'error'); 
+      Swal.fire('Error', 'ไม่สามารถสร้าง PDF ได้', 'error'); 
     });
   }, 1000);
 }
 
-// ================= จัดการวันที่และปีงบประมาณ =================
+// ================= จัดการวันที่ =================
 function initDateLogic() {
   const d = new Date(); const jsMonth = d.getMonth(); const jsYear = d.getFullYear(); 
   currentFiscalYear = jsYear + 543; if (jsMonth >= 9) currentFiscalYear += 1;
@@ -459,7 +422,6 @@ function updateYearDropdown() {
   (currentData.pms || []).forEach(pm => { yearsSet.add(parseFyFromDateStr(pm.date)); });
   
   let sortedYears = Array.from(yearsSet).sort((a,b) => b - a); 
-  
   const selResult = document.getElementById('globalYearFilter');
   if(selResult) selResult.innerHTML = sortedYears.map(y => `<option value="${y}" ${y === selectedFiscalYear ? 'selected' : ''}>ปี ${y}</option>`).join('');
 
@@ -474,14 +436,15 @@ function applyGlobalYearFilter() {
   renderResultMatrix(); renderPMTable();
 }
 
-// ⭐️ บังคับเรียงลำดับแถวตาม EXACT_LOCATION_ORDER
+// ⭐️ ระบบจัดเรียงตารางให้ตรงเป๊ะตาม 23 จุด
+function normalizeLoc(str) { return (str || "").toLowerCase().replace(/[\s\-\/\(\)\.\:]/g, ''); }
+
 function sortDataCustom(data) {
   if(!data) return [];
   data.sort((a, b) => {
-    let nameA = (a.Location || "").trim();
-    let nameB = (b.Location || "").trim();
-    let idxA = EXACT_LOCATION_ORDER.indexOf(nameA);
-    let idxB = EXACT_LOCATION_ORDER.indexOf(nameB);
+    let nameA = normalizeLoc(a.Location); let nameB = normalizeLoc(b.Location);
+    let idxA = EXACT_LOCATION_ORDER.findIndex(l => normalizeLoc(l) === nameA);
+    let idxB = EXACT_LOCATION_ORDER.findIndex(l => normalizeLoc(l) === nameB);
     if (idxA === -1) idxA = 999;
     if (idxB === -1) idxB = 999;
     if (idxA === 999 && idxB === 999) return nameA.localeCompare(nameB);
@@ -490,7 +453,7 @@ function sortDataCustom(data) {
   return data;
 }
 
-// ================= โหลดข้อมูลผ่าน Fetch API =================
+// ================= โหลดข้อมูล =================
 async function loadAllData() {
   const loader = document.getElementById('initialLoader');
   try {
@@ -512,10 +475,7 @@ async function loadAllData() {
       updateYearDropdown(); applyGlobalYearFilter(); 
       renderYearPlan(currentData.plans); renderDbTable(currentData.plans); renderMonthPlan(); 
       
-      if(loader) {
-         loader.style.opacity = '0';
-         setTimeout(() => loader.style.display = 'none', 500);
-      }
+      if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 500); }
     }
   } catch (error) {
     if(loader) loader.style.display = 'none';
@@ -547,26 +507,28 @@ function renderResultMatrix() {
   results.forEach(res => {
     let fyIdx = getFyIndexFromDateString(res.date);
     if(fyIdx !== -1) {
-      if(!resMap[res.location]) resMap[res.location] = {};
-      if(!resMap[res.location][fyIdx]) resMap[res.location][fyIdx] = {};
+      let normResLoc = normalizeLoc(res.location); // Normalize สำหรับจับคู่ผล
+      if(!resMap[normResLoc]) resMap[normResLoc] = {};
+      if(!resMap[normResLoc][fyIdx]) resMap[normResLoc][fyIdx] = {};
       let typeKey = (res.type||"").toUpperCase().includes("C/S") ? "BAC" : "ENDO";
       
-      if(resMap[res.location][fyIdx][typeKey]) {
-        let existingDate = parseThaiDateStr(resMap[res.location][fyIdx][typeKey].date);
+      if(resMap[normResLoc][fyIdx][typeKey]) {
+        let existingDate = parseThaiDateStr(resMap[normResLoc][fyIdx][typeKey].date);
         let newDate = parseThaiDateStr(res.date);
-        if(newDate > existingDate) { resMap[res.location][fyIdx][typeKey] = res; }
-      } else { resMap[res.location][fyIdx][typeKey] = res; }
+        if(newDate > existingDate) { resMap[normResLoc][fyIdx][typeKey] = res; }
+      } else { resMap[normResLoc][fyIdx][typeKey] = res; }
     }
   });
 
   tbody.innerHTML = plans.map((row, index) => {
     let rowBg = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'; let loc = row.Location || "";
+    let normLoc = normalizeLoc(loc);
     let isAAMI = loc.includes("AAMI") || loc.includes("อบระบบ"); 
     let rowHTML = `<tr class="${rowBg} hover:bg-teal-50/70 transition-colors"><td class="font-bold text-slate-500 border-teal-100 pdf-no-col">${row.No || '-'}</td><td class="font-bold text-slate-700 text-left border-teal-100 pdf-loc-col">${loc}</td>`;
     
     for(let m = 0; m < 12; m++) {
-      let bacData = (resMap[loc] && resMap[loc][m]) ? resMap[loc][m]["BAC"] : null; 
-      let endoData = (resMap[loc] && resMap[loc][m]) ? resMap[loc][m]["ENDO"] : null;
+      let bacData = (resMap[normLoc] && resMap[normLoc][m]) ? resMap[normLoc][m]["BAC"] : null; 
+      let endoData = (resMap[normLoc] && resMap[normLoc][m]) ? resMap[normLoc][m]["ENDO"] : null;
 
       if (isAAMI) {
         let hasPlan = (row.checks && (row.checks[m*2].includes("◉") || row.checks[m*2+1].includes("◉")));
@@ -614,7 +576,6 @@ function renderPMTable() {
   if(filterVal !== 'all') {
     filtered = filtered.filter(pm => parseFyFromDateStr(pm.date) === parseInt(filterVal));
   }
-  
   filtered.sort((a,b) => parseThaiDateStr(b.date) - parseThaiDateStr(a.date));
   
   if(filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-slate-400 text-center">ไม่มีข้อมูล PM</td></tr>`; return; }
@@ -663,12 +624,11 @@ function getBase64(file) {
    });
 }
 
-// ⭐️ บันทึกผลผ่าน Fetch API
+// บันทึกผล
 async function submitResultForm(e) {
   e.preventDefault(); 
   const mainFile = document.getElementById('mainFile').files[0];
   const extraFile = document.getElementById('extraFile').files[0];
-  
   Swal.fire({ title: (mainFile || extraFile) ? 'กำลังอัปโหลดและบันทึก...' : 'กำลังบันทึก...', html: 'กรุณารอสักครู่ (อาจใช้เวลาสักนิดหากมีรูปภาพ)...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
   
   const formData = Object.fromEntries(new FormData(document.getElementById('resultForm')));
@@ -680,13 +640,12 @@ async function submitResultForm(e) {
 
   try {
     const res = await callAPI('saveResultData', { form: formData });
-    if(res.status === "success") {
-       closeResultForm(); loadAllData(); Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', showConfirmButton: false, timer: 1500 });
+    if(res.status === "success") { closeResultForm(); loadAllData(); Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', showConfirmButton: false, timer: 1500 });
     } else throw new Error(res.message);
   } catch (error) { Swal.fire('Error', error.message, 'error'); }
 }
 
-// ⭐️ บันทึก PM ผ่าน Fetch API
+// บันทึก PM
 async function submitPMForm(e) {
   e.preventDefault();
   const pmFile = document.getElementById('pmFile').files[0];
@@ -700,8 +659,7 @@ async function submitPMForm(e) {
 
   try {
     const res = await callAPI('savePMData', { form: formData });
-    if(res.status === "success") {
-       closePMModal(); loadAllData(); Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', showConfirmButton: false, timer: 1500 });
+    if(res.status === "success") { closePMModal(); loadAllData(); Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', showConfirmButton: false, timer: 1500 });
     } else throw new Error(res.message);
   } catch (error) { Swal.fire('Error', error.message, 'error'); }
 }
