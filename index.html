@@ -36,23 +36,33 @@
     .menu-active { background-color: #f0fdfa; color: #0f766e; font-weight: bold; border-left: 4px solid #0f766e; }
     .menu-inactive { background-color: transparent; color: #475569; border-left: 4px solid transparent; }
     .menu-inactive:hover { background-color: #f8fafc; color: #0d9488; }
+    
+    .loader { border: 4px solid #f3f4f6; border-top: 4px solid #0d9488; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     @keyframes blink { 0%, 100% { background-color: #fee2e2; color: #ef4444; } 50% { background-color: #ef4444; color: #ffffff; } }
     .blink-alert { animation: blink 1.2s infinite; }
 
-    .pdf-mode { width: max-content !important; min-width: 100% !important; background: white !important; padding: 30px !important; }
-    .pdf-mode .pdf-title { display: block !important; margin-bottom: 20px !important; font-size: 24px !important; }
-    .pdf-mode .table-container { overflow: visible !important; max-height: none !important; border: 2px solid #0f766e !important; box-shadow: none !important; border-radius: 0 !important; }
+    /* ⭐️ แก้ไข PDF Mode ให้สวย พอดีหน้ากระดาษ และรองรับมือถือ ⭐️ */
+    .pdf-mode { width: 100% !important; background: white !important; padding: 0 !important; }
+    .pdf-mode .pdf-title { display: block !important; margin-top: 10px !important; margin-bottom: 10px !important; font-size: 16px !important; text-align: center; }
+    .pdf-mode .table-container { overflow: visible !important; max-height: none !important; border: 1.5px solid #0f766e !important; box-shadow: none !important; border-radius: 0 !important; }
     .pdf-mode th, .pdf-mode td, .pdf-mode tr, .pdf-mode thead, .pdf-mode tbody { position: static !important; transform: none !important; }
-    .pdf-mode .pdf-no-col, .pdf-mode .pdf-loc-col { width: 1% !important; white-space: nowrap !important; }
-    .pdf-mode table { font-size: 14px !important; width: max-content !important; }
-    .pdf-mode th { padding: 10px 14px !important; font-size: 14px !important; border: 1px solid #115e59 !important; color: white !important; }
-    .pdf-mode td { padding: 8px 14px !important; border: 1px solid #cbd5e1 !important; color: black !important; }
+    .pdf-mode table { width: 100% !important; table-layout: fixed !important; } /* บังคับพอดีหน้า */
+    .pdf-mode th { padding: 4px 2px !important; font-size: 9px !important; border: 1px solid #115e59 !important; color: white !important; white-space: normal !important; word-break: break-word; line-height: 1.1; }
+    .pdf-mode td { padding: 4px 2px !important; font-size: 9px !important; border: 1px solid #cbd5e1 !important; color: black !important; white-space: normal !important; word-break: break-word; line-height: 1.1; }
+    .pdf-mode .pdf-no-col { width: 4% !important; }
+    .pdf-mode .pdf-loc-col { width: 18% !important; }
     .pdf-mode .action-col { display: none !important; } 
-    .pdf-mode .dot-cell { cursor: default !important; transform: none !important; }
     .pdf-mode a { text-decoration: none !important; color: #0369a1 !important; font-weight: bold !important; } 
   </style>
 </head>
 <body class="bg-slate-50">
+
+  <div id="initialLoader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center transition-opacity duration-500">
+     <div class="loader mb-4"></div>
+     <h2 class="text-lg font-bold text-teal-700">กำลังเชื่อมต่อฐานข้อมูล...</h2>
+     <p class="text-sm text-slate-400">กรุณารอสักครู่</p>
+  </div>
 
   <div id="sidebarOverlay" x-cloak class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden transition-opacity" onclick="toggleSidebar()"></div>
   <div id="sidebarMenu" x-cloak class="fixed top-0 left-0 w-64 h-full bg-white shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 flex flex-col">
@@ -303,19 +313,19 @@
 <script>
 
 // ==========================================
-// ⭐️ นำ Web App URL ของ Apps Script มาวางในเครื่องหมายคำพูดด้านล่างนี้ ⭐️
+// ⭐️ URL ของ Apps Script คุณ ⭐️
 // ==========================================
 const API_URL = "https://script.google.com/macros/s/AKfycbyOL3J6r5YLT0xYS5-Dle5X-SxfH9OO3JgbHdNGQ8X9J8dk8msoOn2QcT8ilIdNw16b/exec"; 
-
 
 let currentData = { plans: [], results: [], pms: [] };
 let filteredResults = []; 
 let currentRowForSummary = null; 
 
+// ⭐️ พิมพ์ใหม่หมดเพื่อล้างบั๊กสระลอย
 const shortMonths = ["ต.ค.", "พ.ย.", "ธ.ค.", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย."];
 const fullMonths = ["ตุลาคม", "พฤศจิกายน", "ธันวาคม", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน"];
-const thaiM = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
-const thaiFull = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+const thaiM = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+const thaiFull = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 
 let currentFiscalYear = 0; let selectedFiscalYear = 0; let currentMonthIndex = 0; 
 
@@ -323,12 +333,7 @@ let currentFiscalYear = 0; let selectedFiscalYear = 0; let currentMonthIndex = 0
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('[x-cloak]').forEach(el => el.removeAttribute('x-cloak'));
   initDateLogic(); 
-  
-  if (API_URL === "ใส่_URL_WEB_APP_ของคุณที่นี่") {
-      Swal.fire('ข้อผิดพลาด', 'คุณยังไม่ได้ใส่ API URL ในโค้ด (บรรทัดที่ 262)', 'error');
-  } else {
-      loadAllData();
-  }
+  loadAllData();
 });
 
 // ================= ฟังก์ชันเชื่อมต่อกับ Google Apps Script (Fetch API) =================
@@ -340,7 +345,7 @@ async function callAPI(action, payload = {}) {
     });
     return await response.json();
   } catch (error) {
-    throw new Error("ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบ URL หรือการเชื่อมต่ออินเทอร์เน็ต");
+    throw new Error("ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
   }
 }
 
@@ -369,16 +374,39 @@ function switchTab(tabId) {
   toggleSidebar(true); 
 }
 
+// ⭐️ อัปเดต: ระบบ PDF สำหรับมือถือ ⭐️
 function exportToPDF(areaId, fileNamePrefix) {
-  Swal.fire({ title: 'กำลังเตรียมเอกสาร PDF...', text: 'กรุณารอสักครู่', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  Swal.fire({ title: 'กำลังเตรียมเอกสาร PDF...', text: 'กรุณารอสักครู่ (ในมือถืออาจใช้เวลา 10-15 วินาที)', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
   document.querySelectorAll('.fy-label').forEach(el => el.innerText = selectedFiscalYear);
   const element = document.getElementById(areaId);
+  
   element.classList.add('pdf-mode'); 
+  
   setTimeout(() => {
-    const w = element.scrollWidth; const h = element.scrollHeight;
-    const opt = { margin: 10, filename: `${fileNamePrefix}_FY${selectedFiscalYear}.pdf`, image: { type: 'jpeg', quality: 1 }, html2canvas: { scale: 2, useCORS: true, windowWidth: w }, jsPDF: { unit: 'px', format: [w + 20, h + 20], orientation: w > h ? 'landscape' : 'portrait' } };
-    html2pdf().set(opt).from(element).save().then(() => { element.classList.remove('pdf-mode'); Swal.close(); }).catch(err => { element.classList.remove('pdf-mode'); Swal.fire('Error', err, 'error'); });
-  }, 800);
+    const opt = { 
+      margin: [10, 5, 10, 5], 
+      filename: `${fileNamePrefix}_FY${selectedFiscalYear}.pdf`, 
+      image: { type: 'jpeg', quality: 0.98 }, 
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true,
+        windowWidth: 1200 // บังคับหลอกมือถือให้เรนเดอร์แบบหน้าจอคอมพิวเตอร์
+      }, 
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'landscape' 
+      } 
+    };
+    
+    html2pdf().set(opt).from(element).save().then(() => { 
+      element.classList.remove('pdf-mode'); 
+      Swal.close(); 
+    }).catch(err => { 
+      element.classList.remove('pdf-mode'); 
+      Swal.fire('Error', 'ไม่สามารถสร้าง PDF ได้: ' + err, 'error'); 
+    });
+  }, 1000);
 }
 
 // ================= จัดการวันที่และปีงบประมาณ =================
@@ -445,6 +473,7 @@ function sortDataCustom(data) {
 
 // ================= โหลดข้อมูลผ่าน Fetch API =================
 async function loadAllData() {
+  const loader = document.getElementById('initialLoader');
   try {
     const response = await fetch(API_URL + "?action=fetchAllData");
     const data = await response.json();
@@ -463,8 +492,14 @@ async function loadAllData() {
       
       updateYearDropdown(); applyGlobalYearFilter(); 
       renderYearPlan(currentData.plans); renderDbTable(currentData.plans); renderMonthPlan(); 
+      
+      if(loader) {
+         loader.style.opacity = '0';
+         setTimeout(() => loader.style.display = 'none', 500);
+      }
     }
   } catch (error) {
+    if(loader) loader.style.display = 'none';
     Swal.fire('Connection Error', error.message, 'error'); 
     document.getElementById('resultMatrixBody').innerHTML = `<tr><td colspan="26" class="text-center py-6 text-red-500 font-bold">ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้</td></tr>`;
   }
@@ -577,7 +612,6 @@ function renderPMTable() {
   `).join('');
 }
 
-
 // ================= ระบบ ฟอร์ม Upload รูปภาพ & API =================
 function openQuickResultForm(loc, type, mIdx) {
   document.getElementById('resultForm').reset();
@@ -617,7 +651,7 @@ async function submitResultForm(e) {
   const mainFile = document.getElementById('mainFile').files[0];
   const extraFile = document.getElementById('extraFile').files[0];
   
-  Swal.fire({ title: (mainFile || extraFile) ? 'กำลังอัปโหลด...' : 'กำลังบันทึก...', html: 'กรุณารอสักครู่...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  Swal.fire({ title: (mainFile || extraFile) ? 'กำลังอัปโหลดและบันทึก...' : 'กำลังบันทึก...', html: 'กรุณารอสักครู่ (อาจใช้เวลาสักนิดหากมีรูปภาพ)...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
   
   const formData = Object.fromEntries(new FormData(document.getElementById('resultForm')));
   const parts = formData.rawDate.split('-');
@@ -638,7 +672,7 @@ async function submitResultForm(e) {
 async function submitPMForm(e) {
   e.preventDefault();
   const pmFile = document.getElementById('pmFile').files[0];
-  Swal.fire({ title: pmFile ? 'กำลังอัปโหลด PM...' : 'กำลังบันทึก PM...', html: 'กรุณารอสักครู่...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  Swal.fire({ title: pmFile ? 'กำลังอัปโหลดและบันทึก PM...' : 'กำลังบันทึก PM...', html: 'กรุณารอสักครู่...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
   
   const formData = Object.fromEntries(new FormData(document.getElementById('pmForm')));
   const parts = formData.rawDate.split('-');
